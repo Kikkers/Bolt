@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23a2f0c07f22c834ca6507de248cf55a, type: 3}
+  m_Name: Player
+  m_EditorClassIdentifier: 
+  GrappleSpawns: 1
+  GrappleSpeed: 40
+  GrappleForce: 40
+  JetpackFuel: 1
+  JetpackForce: 20
+  WalkDrag: 3
+  AirDrag: 0
+  JetDrag: 0
+  WalkMoveForce: 20
+  MoveForce: 1
+  JumpForce: 1
+  OnSurfaceCoyoteTime: 0.2
+  StationaryFrictionSpeed: 0.01
+  HighFriction: {fileID: 0}
+  NoFriction: {fileID: 0}
