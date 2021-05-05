@@ -84,7 +84,7 @@ namespace SplineMesh {
 
             if (curveSpace) {
                 int i = 0;
-                foreach (var curve in spline.curves) {
+                foreach (var curve in spline.Curves) {
                     var go = FindOrCreate("segment " + i++ + " mesh");
                     go.GetComponent<MeshBender>().SetInterval(curve);
                     go.GetComponent<MeshCollider>().enabled = generateCollider;

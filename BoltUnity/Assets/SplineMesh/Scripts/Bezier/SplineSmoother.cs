@@ -26,7 +26,7 @@ namespace SplineMesh {
 
         private void OnEnable() {
             Spline.NodeListChanged += Spline_NodeListChanged;
-            foreach(var node in Spline.nodes) {
+            foreach(var node in Spline.Nodes) {
                 node.Changed += OnNodeChanged;
             }
             SmoothAll();
@@ -34,7 +34,7 @@ namespace SplineMesh {
 
         private void OnDisable() {
             Spline.NodeListChanged -= Spline_NodeListChanged;
-            foreach (var node in Spline.nodes) {
+            foreach (var node in Spline.Nodes) {
                 node.Changed -= OnNodeChanged;
             }
         }
@@ -55,18 +55,18 @@ namespace SplineMesh {
         private void OnNodeChanged(object sender, EventArgs e) {
             var node = (SplineNode)sender;
             SmoothNode(node);
-            var index = Spline.nodes.IndexOf(node);
+            var index = Spline.IndexOf(node);
             if(index > 0) {
-                SmoothNode(Spline.nodes[index - 1]);
+                SmoothNode(Spline.Nodes[index - 1]);
             }
-            if(index < Spline.nodes.Count - 1) {
-                SmoothNode(Spline.nodes[index + 1]);
+            if(index < Spline.Nodes.Count - 1) {
+                SmoothNode(Spline.Nodes[index + 1]);
 
             }
         }
 
         private void SmoothNode(SplineNode node) {
-            var index = Spline.nodes.IndexOf(node);
+            var index = Spline.IndexOf(node);
             var pos = node.Position;
             // For the direction, we need to compute a smooth vector.
             // Orientation is obtained by substracting the vectors to the previous and next way points,
@@ -75,13 +75,13 @@ namespace SplineMesh {
             var dir = Vector3.zero;
             float averageMagnitude = 0;
             if (index != 0) {
-                var previousPos = Spline.nodes[index - 1].Position;
+                var previousPos = Spline.Nodes[index - 1].Position;
                 var toPrevious = pos - previousPos;
                 averageMagnitude += toPrevious.magnitude;
                 dir += toPrevious.normalized;
             }
-            if (index != Spline.nodes.Count - 1) {
-                var nextPos = Spline.nodes[index + 1].Position;
+            if (index != Spline.Nodes.Count - 1) {
+                var nextPos = Spline.Nodes[index + 1].Position;
                 var toNext = pos - nextPos;
                 averageMagnitude += toNext.magnitude;
                 dir -= toNext.normalized;
@@ -99,7 +99,7 @@ namespace SplineMesh {
 
 
         private void SmoothAll() {
-            foreach(var node in Spline.nodes) {
+            foreach(var node in Spline.Nodes) {
                 SmoothNode(node);
             }
         }

@@ -70,7 +70,7 @@ namespace SplineMesh {
 
             int i = 0;
             float textureOffset = 0.0f;
-            foreach (CubicBezierCurve curve in spline.GetCurves()) {
+            foreach (CubicBezierCurve curve in spline.Curves) {
                 GameObject go = UOUtility.Create("segment " + i++,
                     generated,
                     typeof(MeshFilter),

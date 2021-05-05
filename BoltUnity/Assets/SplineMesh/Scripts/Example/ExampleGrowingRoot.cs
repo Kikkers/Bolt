@@ -64,12 +64,12 @@ namespace SplineMesh {
         private void Contort() {
             float nodeDistance = 0;
             int i = 0;
-            foreach (var n in spline.nodes) {
+            foreach (var n in spline.Nodes) {
                 float nodeDistanceRate = nodeDistance / spline.Length;
                 float nodeScale = startScale * (rate - nodeDistanceRate);
                 n.Scale = new Vector2(nodeScale, nodeScale);
-                if (i < spline.curves.Count) {
-                    nodeDistance += spline.curves[i++].Length;
+                if (i < spline.Curves.Count) {
+                    nodeDistance += spline.Curves[i++].Length;
                 }
             }
 

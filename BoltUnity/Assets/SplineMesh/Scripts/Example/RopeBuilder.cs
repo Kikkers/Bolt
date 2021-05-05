@@ -57,7 +57,7 @@ namespace SplineMesh {
         private void UpdateNodes() {
             int i = 0;
             foreach (GameObject wayPoint in wayPoints) {
-                var node = spline.nodes[i++];
+                var node = spline.Nodes[i++];
                 if (Vector3.Distance(node.Position, transform.InverseTransformPoint(wayPoint.transform.position)) > 0.001f) {
                     node.Position = transform.InverseTransformPoint(wayPoint.transform.position);
                     node.Up = wayPoint.transform.up;
@@ -71,11 +71,11 @@ namespace SplineMesh {
             }
             int nodeCount = wayPoints.Count;
             // adjust the number of nodes in the spline.
-            while (spline.nodes.Count < nodeCount) {
+            while (spline.Nodes.Count < nodeCount) {
                 spline.AddNode(new SplineNode(Vector3.zero, Vector3.zero));
             }
-            while (spline.nodes.Count > nodeCount && spline.nodes.Count > 2) {
-                spline.RemoveNode(spline.nodes.Last());
+            while (spline.Nodes.Count > nodeCount && spline.Nodes.Count > 2) {
+                spline.RemoveNode(spline.Nodes.Last());
             }
         }
 
