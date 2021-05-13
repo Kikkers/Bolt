@@ -14,24 +14,18 @@ namespace Deform.Custom
 	[Deformer(Name = "Freeform", Description = "3D representation of bezier curves", XRotation = -90f, Type = typeof(FreeformDeformer))]
 	public class FreeformDeformer : Deformer
 	{
-		public static readonly int3 Count = new int3(4, 4, 4);
+		public int3 Count = new int3(4, 4, 4);
 		public int Count3d => Count.x * Count.y * Count.z;
-
-		internal static HashSet<FreeformDeformer> currentlyEditedFFDs = new HashSet<FreeformDeformer>();
 
 		[ListDrawerSettings(HideAddButton = true, HideRemoveButton = true, DraggableItems = false)]
 		[SerializeField] private Vector3[] controlPoints;
-		[HideInInspector]
-		[SerializeField] private FreeformDeformEditNode[] editNodes;
 
-		internal FreeformDeformEditNode[] EditNodes => editNodes;
-
-		public override DataFlags DataFlags => DataFlags.Vertices;
+		public event System.Action NumControlPointsChanged;
 
 		public Vector3 this[int x, int y, int z]
 		{
-			get => controlPoints[ToIndex(x, y, z)];
-			set => controlPoints[ToIndex(x, y, z)] = value;
+			get => controlPoints[ToIndex(Count.y, Count.z, x, y, z)];
+			set => controlPoints[ToIndex(Count.y, Count.z, x, y, z)] = value;
 		}
 
 		public Vector3 this[int i]
@@ -40,9 +34,9 @@ namespace Deform.Custom
 			set => controlPoints[i] = value;
 		}
 
-		public static int ToIndex(int x, int y, int z)
+		public static int ToIndex(int sizeY, int sizeZ, int x, int y, int z)
 		{
-			return x * Count.y * Count.z + y * Count.z + z;
+			return x * sizeY * sizeZ + y * sizeZ + z;
 		}
 
 		public Vector3 ToWorld(Vector3 localPoint)
@@ -53,7 +47,6 @@ namespace Deform.Custom
 		private void Reset()
 		{
 			controlPoints = new Vector3[Count3d];
-			editNodes = new FreeformDeformEditNode[Count3d];
 
 			for (int x = 0; x < Count.x; ++x)
 				for (int y = 0; y < Count.y; ++y)
@@ -64,6 +57,8 @@ namespace Deform.Custom
 							y / (Count.y - 1), 
 							z / (Count.z - 1));
 					}
+
+			NumControlPointsChanged?.Invoke();
 		}
 
 		public void OnDrawGizmos()
@@ -102,6 +97,8 @@ namespace Deform.Custom
 		}
 
 		public Transform test;
+
+		public override DataFlags DataFlags => DataFlags.Vertices;
 
 		public override JobHandle Process(MeshData data, JobHandle dependency = default)
 		{
@@ -226,7 +223,7 @@ namespace Deform.Custom
 
 			private float3 GetCageBezierZ(ref SampleParams sampleParams, int x, int y)
 			{
-				int minZ = ToIndex(x, y, sampleParams.minZ);
+				int minZ = ToIndex(totalSize.y, totalSize.z, x, y, sampleParams.minZ);
 				int sizeZ = sampleParams.sizeZ;
 				float t = sampleParams.tZ;
 
