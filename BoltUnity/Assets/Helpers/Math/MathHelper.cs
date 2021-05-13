@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Unity.Mathematics;
+using UnityEngine;
 
-namespace Codeglue
+namespace Helpers
 {
 	public static class MathHelper
 	{
@@ -35,5 +36,26 @@ namespace Codeglue
 			return new Quaternion(Result.x, Result.y, Result.z, Result.w);
 		}
 
+
+		public static float3 QuadBezier(float3 p0, float3 p1, float3 p2, float t)
+		{
+			float tInv = 1f - t;
+			return
+				p0 * (tInv * tInv) +
+				p1 * (2f * tInv * t) +
+				p2 * (t * t);
+		}
+
+		public static float3 CubicBezier(float3 p0, float3 p1, float3 p2, float3 p3, float t)
+		{
+			float tInv = 1f - t;
+			float tInv2 = tInv * tInv;
+			float t2 = t * t;
+			return
+				p0 * (tInv2 * tInv) +
+				p1 * (3f * tInv2 * t) +
+				p2 * (3f * tInv * t2) +
+				p3 * (t2 * t);
+		}
 	}
 }

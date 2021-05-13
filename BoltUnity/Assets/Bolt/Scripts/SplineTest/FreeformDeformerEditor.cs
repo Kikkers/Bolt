@@ -67,7 +67,7 @@ namespace DeformEditor.Custom
 
 			FreeformDeformer ffd = target as FreeformDeformer;
 
-			for (int i = 0; i < FreeformDeformer.count3d; ++i)
+			for (int i = 0; i < ffd.Count3d; ++i)
 			{
 				GameObject obj = new GameObject("ffdnode" + i, typeof(FreeformDeformEditNode))
 				{
