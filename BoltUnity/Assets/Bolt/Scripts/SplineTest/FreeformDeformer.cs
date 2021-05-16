@@ -12,20 +12,24 @@ using Helpers;
 namespace Deform.Custom
 {
 	[Deformer(Name = "Freeform", Description = "3D representation of bezier curves", XRotation = -90f, Type = typeof(FreeformDeformer))]
-	public class FreeformDeformer : Deformer
+	public class FreeformDeformer : Deformer, IFactor
 	{
-		public int3 Count = new int3(4, 4, 4);
-		public int Count3d => Count.x * Count.y * Count.z;
+		[SerializeField] private float factor = 1;
+		[SerializeField] private int3 count = new int3(4, 4, 4);
 
 		[ListDrawerSettings(HideAddButton = true, HideRemoveButton = true, DraggableItems = false)]
 		[SerializeField] private Vector3[] controlPoints;
 
 		public event System.Action NumControlPointsChanged;
 
+		public int3 Count => count;
+		public int Count3d => count.x * count.y * count.z;
+		public float Factor { get => factor; set => factor = value; }
+
 		public Vector3 this[int x, int y, int z]
 		{
-			get => controlPoints[ToIndex(Count.y, Count.z, x, y, z)];
-			set => controlPoints[ToIndex(Count.y, Count.z, x, y, z)] = value;
+			get => controlPoints[ToIndex(count.y, count.z, x, y, z)];
+			set => controlPoints[ToIndex(count.y, count.z, x, y, z)] = value;
 		}
 
 		public Vector3 this[int i]
@@ -34,69 +38,64 @@ namespace Deform.Custom
 			set => controlPoints[i] = value;
 		}
 
-		public static int ToIndex(int sizeY, int sizeZ, int x, int y, int z)
-		{
-			return x * sizeY * sizeZ + y * sizeZ + z;
-		}
+		public static int ToIndex(int sizeY, int sizeZ, int x, int y, int z) => x * sizeY * sizeZ + y * sizeZ + z;
 
-		public Vector3 ToWorld(Vector3 localPoint)
-		{
-			return transform.TransformPoint(localPoint);
-		}
+		public int ToIndex(int x, int y, int z) => ToIndex(count.y, count.z, x, y, z);
+
+		public Vector3 ToWorld(Vector3 localPoint) => transform.TransformPoint(localPoint);
+
 
 		private void Reset()
 		{
 			controlPoints = new Vector3[Count3d];
 
-			for (int x = 0; x < Count.x; ++x)
-				for (int y = 0; y < Count.y; ++y)
-					for (int z = 0; z < Count.z; ++z)
+			for (int x = 0; x < count.x; ++x)
+				for (int y = 0; y < count.y; ++y)
+					for (int z = 0; z < count.z; ++z)
 					{
 						this[x, y, z] = new Vector3(
-							x / (Count.x - 1), 
-							y / (Count.y - 1), 
-							z / (Count.z - 1));
+							x / (count.x - 1), 
+							y / (count.y - 1), 
+							z / (count.z - 1));
 					}
 
 			NumControlPointsChanged?.Invoke();
 		}
 
-		public void OnDrawGizmos()
-		{
-			Gizmos.color = Color.yellow;
-			for (int x = 0; x < Count.x; ++x)
-			{
-				for (int y = 0; y < Count.y; ++y)
-				{
-					for (int z = 0; z < Count.z; ++z)
-					{
-						if (x + 1 < Count.x) Gizmos.DrawLine(ToWorld(this[x, y, z]), ToWorld(this[x + 1, y, z]));
-						if (y + 1 < Count.y) Gizmos.DrawLine(ToWorld(this[x, y, z]), ToWorld(this[x, y + 1, z]));
-						if (z + 1 < Count.z) Gizmos.DrawLine(ToWorld(this[x, y, z]), ToWorld(this[x, y, z + 1]));
-					}
-				}
-			}
-
-			if (test == null)
-			{
-				test = new GameObject("TEST").transform;
-			}
-
-			Gizmos.color = Color.red;
-			Vector3 worldPos = test.position;
-			Vector3 pos = transform.InverseTransformPoint(worldPos);
-			if (pos.x < 0 || pos.x > 1 || pos.y < 0 || pos.y > 1|| pos.z < 0 || pos.z > 1)
-			{
-				Gizmos.DrawWireSphere(test.position, 0.2f);
-			}
-			else
-			{
-				Vector3 newP = new FFDJob().Manual(this, worldPos);
-				Gizmos.DrawWireSphere(newP, 0.1f);
-			}
-		}
-
-		public Transform test;
+		//public void OnDrawGizmos()
+		//{
+		//	Gizmos.color = Color.yellow;
+		//	for (int x = 0; x < Count.x; ++x)
+		//	{
+		//		for (int y = 0; y < Count.y; ++y)
+		//		{
+		//			for (int z = 0; z < Count.z; ++z)
+		//			{
+		//				if (x + 1 < Count.x) Gizmos.DrawLine(ToWorld(this[x, y, z]), ToWorld(this[x + 1, y, z]));
+		//				if (y + 1 < Count.y) Gizmos.DrawLine(ToWorld(this[x, y, z]), ToWorld(this[x, y + 1, z]));
+		//				if (z + 1 < Count.z) Gizmos.DrawLine(ToWorld(this[x, y, z]), ToWorld(this[x, y, z + 1]));
+		//			}
+		//		}
+		//	}
+		//
+		//	if (test == null)
+		//	{
+		//		test = new GameObject("TEST").transform;
+		//	}
+		//
+		//	Gizmos.color = Color.red;
+		//	Vector3 worldPos = test.position;
+		//	Vector3 pos = transform.InverseTransformPoint(worldPos);
+		//	if (pos.x < 0 || pos.x > 1 || pos.y < 0 || pos.y > 1|| pos.z < 0 || pos.z > 1)
+		//	{
+		//		Gizmos.DrawWireSphere(test.position, 0.2f);
+		//	}
+		//	else
+		//	{
+		//		Vector3 newP = new FFDJob().Manual(this, worldPos);
+		//		Gizmos.DrawWireSphere(newP, 0.1f);
+		//	}
+		//}
 
 		public override DataFlags DataFlags => DataFlags.Vertices;
 
@@ -117,8 +116,9 @@ namespace Deform.Custom
 			return new FFDJob
 			{
 				controlPoints = controlPointData,
-				totalSize = Count,
-				influenceMaxSize = Count,
+				factor = factor,
+				totalSize = count,
+				influenceMaxSize = count,
 				meshToAxis = meshToAxis,
 				axisToMesh = meshToAxis.inverse,
 				vertices = data.DynamicNative.VertexBuffer
@@ -130,6 +130,7 @@ namespace Deform.Custom
 		{
 			[DeallocateOnJobCompletion]
 			[ReadOnly] public NativeArray<float3> controlPoints;
+			[ReadOnly] public float factor;
 			[ReadOnly] public int3 totalSize;
 			[ReadOnly] public int3 influenceMaxSize;
 			[ReadOnly] public float4x4 meshToAxis;
@@ -170,7 +171,8 @@ namespace Deform.Custom
 					tY = vert.y,
 					tZ = vert.z,
 				};
-				return GetCageBezierZYX(ref sampleParams);
+				float3 deformed = GetCageBezierZYX(ref sampleParams);
+				return lerp(vert, deformed, factor);
 			}
 
 
@@ -183,6 +185,7 @@ namespace Deform.Custom
 
 			private void ManualPrepareJob(FreeformDeformer deformer)
 			{
+				factor = deformer.factor;
 				influenceMaxSize = new int3(4, 4, 4);
 				for (int i = 0; i < deformer.Count3d; ++i)
 					controlPoints[i] = deformer[i];

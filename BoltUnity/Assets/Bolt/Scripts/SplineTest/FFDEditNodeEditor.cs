@@ -5,7 +5,7 @@ using UnityEngine;
 namespace DeformEditor.Custom
 {
 
-	[CustomEditor(typeof(FFDEditNode)), CanEditMultipleObjects]
+	[CustomEditor(typeof(FFDEditNodeEditor)), CanEditMultipleObjects]
 	public class FFDEditNodeEditor : Editor
 	{
 		private void OnSceneGUI()
